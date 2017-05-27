@@ -23,9 +23,14 @@ app.use(cors); //custom middleware for CORS
 //User
 app.post('/user/register', cUser.register);
 app.post('/user/login', cUser.login);
+
 app.post('/user/createreq', checkAuthenticated, cUser.createRequest);
 
 app.get('/user/getreqs', checkAuthenticated, cUser.getLoginRequests);
+app.get('/user/getreq/:id', checkAuthenticated, cUser.getRequest);
+app.get('/user/getres/:id', checkAuthenticated, cUser.getResponse);
+app.get('/user/getresdet/:id', checkAuthenticated, cUser.getResponseDetail);
+
 app.get('/user/getlogin', checkAuthenticated, cUser.getLogin);
 
 //Connection

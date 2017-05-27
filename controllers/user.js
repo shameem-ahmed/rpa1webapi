@@ -1,15 +1,17 @@
 var jwt = require('jwt-simple');
 var moment = require('moment');
 
-var User = require('../models/user').User;
-var Request = require('../models/user').Request;
+var rpa1User = require('../models/user').rpa1User;
+var rpa1Request = require('../models/user').rpa1Request;
+var rpa1Response = require('../models/user').rpa1Response;
+var rpa1ResponseDetail = require('../models/user').rpa1ResponseDetail;
 
 module.exports = {
 
     register: function (req, res) {
         console.log("user.register");
 
-        User.findOne({
+        rpa1User.findOne({
             email: req.body.email
         }, function (err, existingUser) {
 
@@ -25,9 +27,9 @@ module.exports = {
                 isActive: true
             };
 
-            var user = new User(mUser);
+            var rpa1user = new rpa1User(mUser);
 
-            user.save(function (err, result) {
+            rpa1user.save(function (err, result) {
                 if (err) {
                     res.status(500).send({
                         message: err.message
@@ -50,7 +52,7 @@ module.exports = {
         console.log('user.login');
         console.log(req.body);
 
-        User.findOne({
+        rpa1User.findOne({
             email: req.body.email
         }, function (err, user) {
             if (!user)
@@ -93,7 +95,7 @@ module.exports = {
         console.log(mRequest);
 
 
-        var request1 = new Request(mRequest);
+        var request1 = new rpa1Request(mRequest);
 
         request1.save(function (err, result) {
             if (err) {
@@ -109,16 +111,60 @@ module.exports = {
     },
 
     getLoginRequests: function (req, res) {
-        console.log('user.getRequests');
+        console.log('user.getLoginRequests');
         var userId = req.user;
 
-        Request.find({ user: userId }).exec(function (err, data) {
+        rpa1Request.find({ user: userId }).exec(function (err, data) {
 
             if (!data)
                 return res.status(401).send({ message: 'Requests not found' });
 
+            console.log(data);
+
             res.send(data);
-        })
+        });
+    },
+
+    getRequest: function (req, res) {
+        console.log('user.getRequest');
+        var reqId = req.params.id;
+
+        rpa1Request.findById(reqId, function(err, data) {
+            if (!data)
+                return res.status(401).send({ message: 'Request not found' });
+
+            res.send(data);
+        });
+    },
+
+    getResponse: function (req, res) {
+        console.log('user.getResponse');
+        var reqId = req.params.id;
+
+        console.log(reqId);
+
+        rpa1Response.find({ request: reqId }).exec(function (err, data) {
+
+            if (!data)
+                return res.status(401).send({ message: 'Response not found' });
+
+            console.log(data);
+
+            res.send(data);
+        });
+    },
+
+    getResponseDetail: function (req, res) {
+        console.log('user.getResponseDetail');
+        var resId = req.params.id;
+
+       rpa1ResponseDetail.find({ response: resId }).exec(function (err, data) {
+
+            if (!data)
+                return res.status(401).send({ message: 'ResponseDetail not found' });
+
+            res.send(data);
+        });
     },
 
     getLogin: function (req, res) {
@@ -127,7 +173,7 @@ module.exports = {
 
         console.log(id);
 
-        User.findById(id, function(err, data) {
+        rpa1User.findById(id, function(err, data) {
 
             if (!data)
                 return res.status(401).send({ message: 'User not found' });
